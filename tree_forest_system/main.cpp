@@ -84,39 +84,64 @@ public:
                 return;
             }
 
-            TreeNode *p[200] = {nullptr};
-            char c;
-            int i = 0;
-            map<char, int> map1;
-            while (file.get(c)) {
-                if (c == ' ')
-                    break;
-                TreeNode *m = new TreeNode;
-                m->val = c;
-                map1[c] = i;
-                p[i++] = m;
-            }
-            TreeNode *ptr;
-            int cnt = 0;
-            while (file.get(c)) {
-                if (c == ' ') {
-                    cnt = 0;
-                    continue;
-                } else if (cnt == 0) {
-                    ptr = p[map1[c]];
-                    cnt = 0;
-                    cnt++;
-                } else {
-                    if (cnt == 1) {
-                        ptr->firstChild = p[map1[c]];
-                        ptr = ptr->firstChild;
+                TreeNode *p[200] = {nullptr};
+                char c;
+                int i = 0;
+                loop:
+            while (!file.eof()) {
+                int u = i;
+                map<char, int> map1;
+                while (file.get(c)) {
+                    if (c == ' ')
+                        break;
+                    else if (c == '\n'){
+                        if(u==0) {
+                            root = p[0];
+                        }
+                        else {
+                            root->nextSibling = p[u];
+                            root = root->nextSibling;
+                        }
+                        goto loop;
+                    }
+                    TreeNode *m = new TreeNode;
+                    m->val = c;
+                    map1[c] = i;
+                    p[i++] = m;
+                }
+                TreeNode *ptr;
+                int cnt = 0;
+                while (file.get(c)) {
+                    if (c == ' ') {
+                        cnt = 0;
+                        continue;
+                    } else if (cnt == 0) {
+                        ptr = p[map1[c]];
+                        cnt = 0;
                         cnt++;
-                    } else {
-                        ptr->nextSibling = p[map1[c]];
-                        ptr = ptr->nextSibling;
-                        cnt++;
+                    } else if(c=='\n'){
+                        if(u==0) {
+                            root = p[0];
+                        }
+                        else {
+                            root->nextSibling = p[u];
+                            root = root->nextSibling;
+                        }
+                        goto loop;
+                    }
+                    else {
+                        if (cnt == 1) {
+                            ptr->firstChild = p[map1[c]];
+                            ptr = ptr->firstChild;
+                            cnt++;
+                        } else {
+                            ptr->nextSibling = p[map1[c]];
+                            ptr = ptr->nextSibling;
+                            cnt++;
+                        }
                     }
                 }
+                root->nextSibling = p[u];
             }
             root = p[0];
         }
@@ -246,7 +271,7 @@ TreeNode* forestToBinaryTree(vector<tree> forest) {
     return root;
 }
 int main() {
-    tree a("C:\\Users\\ZYF\\CLionProjects\\tree_forest_system\\trees.txt",0);
+    tree a("C:\\Users\\ZYF\\CLionProjects\\tree_forest_system\\forests.txt",1);
     preorderTraversal(a.get_root());
 
 }
